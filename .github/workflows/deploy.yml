@@ -18,7 +18,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: nik
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 52198 
+          port: 12075 
           script: |
             cd ~/docker-webapp
             git pull origin main
