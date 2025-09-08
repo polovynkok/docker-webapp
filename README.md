@@ -1,3 +1,3 @@
-"git commit -m "Test deploy" -n
-"git push origin main"
-
+git commit -m "Test deploy
+git push origin main
+Nikolas
