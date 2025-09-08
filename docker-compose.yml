@@ -9,6 +9,7 @@ services:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
       POSTGRES_DB: devdb
+      TZ: Europe/KIev
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
