@@ -1,26 +1,27 @@
-name: Deploy
+name: Deploy Docker Webapp
 
 on:
   push:
     branches:
-      - main   
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.SERVER_IP }}       
-          username: nik                        
-          key: ${{ secrets.SSH_PRIVATE_KEY }}   
-          port: 12075                            
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd ~/docker-webapp
             git pull origin main
             docker compose up -d --build
+
