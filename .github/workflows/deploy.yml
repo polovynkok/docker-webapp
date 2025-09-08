@@ -18,12 +18,12 @@ jobs:
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: 46.150.23.102         
-          username: nik    
+          host: ${{ secrets.SSH_HOST }}         
+          username: ${{ secret.SSH_USER }}    
           key: ${{ secrets.SSH_PRIVATE_KEY }}   
           port: ${{ secrets.SSH_PORT }}         
           script: |
             cd ~/docker-webapp                  
             git pull origin main                 
-            docker compose up -d --build        
-
+            docker compose up -d --build --force-recreate        
+            docker compose ps
