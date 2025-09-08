@@ -2,14 +2,6 @@ from flask import Flask
 import os
 import psycopg2
 import time
-import pytz
-from datetime import datetime
-
-utc_time = datetime.utcnow()
-kiev_tz = pytz.timezone('Europe/Kiev')
-kiev_time = utc_time.replace(tzinfo=pytz.utc).astimezone(kiev_tz)
-
-print("Kiev time:", kiev_time)
 
 app = Flask(__name__)
 
