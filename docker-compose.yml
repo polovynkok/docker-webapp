@@ -18,6 +18,26 @@ services:
       timeout: 5s
       retries: 5
 
+  backup:
+    image: postgres:15
+    container_name: pg_backup
+    depends_on:
+      - db
+    volumes:
+      - ./docker-webapp/backups:/backups
+    environment:
+      - PGPASSWORD=devpass
+    entrypoint: >
+      bash -c "while true; do
+        TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+        pg_dump -h db -U devuser devdb > /backups/db_$TIMESTAMP.sql;
+        echo Backup created at /backups/db_$TIMESTAMP.sql;
+        find /backups -type f -name '*.sql' -mtime +7 -delete;
+        echo Old backups deleted;
+        sleep 60;
+      done"
+
+
   app:
     build: ./app
     container_name: flask_app
@@ -41,6 +61,9 @@ services:
     depends_on:
       app:
         condition: service_started
+
+
+  
 
 volumes:
   db_data:
