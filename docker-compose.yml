@@ -28,14 +28,18 @@ services:
     environment:
       - PGPASSWORD=devpass
     entrypoint: >
-      bash -c "while true; do
-        TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
-        pg_dump -h db -U devuser devdb > /backups/db_$TIMESTAMP.sql;
-        echo Backup created at /backups/db_$TIMESTAMP.sql;
-        find /backups -type f -name '*.sql' -mtime +7 -delete;
-        echo Old backups deleted;
-        sleep 86400;
-      done"
+        bash -c "while true; do
+         TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+         UUID=$(cat /proc/sys/kernel/random/uuid);
+         FILE=/backups/db_${TIMESTAMP}_${UUID}.sql;
+         echo 'Creating backup:' $FILE;
+         PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h db -U devuser devdb > $FILE;
+         echo 'Backup completed:' $FILE;
+         find /backups -type f -name '*.sql' -mtime +7 -delete;
+         echo 'Old backups deleted';
+         sleep 86400;
+        done"
+
 
 
   app:
