@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
       POSTGRES_DB: devdb
-      TZ: Europe/Kiev
+      TZ: Europe/KIev
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,27 +24,18 @@ services:
     depends_on:
       - db
     volumes:
-      - ./backups:/backups
+      - ./docker-webapp/backups:/backups
     environment:
-      - POSTGRES_USER=devuser
-      - POSTGRES_PASSWORD=devpass
-      - POSTGRES_DB=devdb
       - PGPASSWORD=devpass
-    entrypoint:
-      - bash
-      - -c
-      - |
-        while true; do
-          TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
-          UUID=$(cat /proc/sys/kernel/random/uuid)
-          FILE="/backups/db_${TIMESTAMP}_${UUID}.sql"
-          echo "Creating backup: $FILE"
-          PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h db -U $POSTGRES_USER $POSTGRES_DB > "$FILE"
-          echo "Backup completed: $FILE"
-          find /backups -type f -name '*.sql' -mtime +7 -delete
-          echo "Old backups deleted"
-          sleep 60
-        done
+    entrypoint: >
+      bash -c "while true; do
+        TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
+        pg_dump -h db -U devuser devdb > /backups/db_$TIMESTAMP.sql;
+        echo Backup created at /backups/db_$TIMESTAMP.sql;
+        find /backups -type f -name '*.sql' -mtime +7 -delete;
+        echo Old backups deleted;
+        sleep 60;
+      done"
 
 
   app:
@@ -76,4 +67,3 @@ services:
 
 volumes:
   db_data:
-
