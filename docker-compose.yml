@@ -24,7 +24,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./docker-webapp/backups:/backups
+      - ./backups:/backups
     environment:
       - PGPASSWORD=devpass
     entrypoint: >
