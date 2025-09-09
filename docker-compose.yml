@@ -26,6 +26,9 @@ services:
     volumes:
       - ./backups:/backups
     environment:
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_DB=devdb
       - PGPASSWORD=devpass
     entrypoint:
       - bash
