@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
       POSTGRES_DB: devdb
-      TZ: Europe/KIev
+      TZ: Europe/Kiev
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,7 +24,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./docker-webapp/backups:/backups
+      - ./backups:/backups
     environment:
       - PGPASSWORD=devpass
     entrypoint: >
@@ -34,7 +34,7 @@ services:
         echo Backup created at /backups/db_$TIMESTAMP.sql;
         find /backups -type f -name '*.sql' -mtime +7 -delete;
         echo Old backups deleted;
-        sleep 60;
+        sleep 86400;
       done"
 
 
