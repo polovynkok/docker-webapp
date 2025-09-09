@@ -1,0 +1,42 @@
+name: CI (build + Telegram notify)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t flask-app ./app
+
+      - name: Run tests (placeholder)
+        run: echo "Run your tests here"
+
+      - name: Notify Telegram (final status)
+        if: ${{ always() }}
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          BUILD_STATUS: ${{ job.status }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ACTOR: ${{ github.actor }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if [ "$BUILD_STATUS" = "success" ]; then ICON="✅"; else ICON="❌"; fi
+          SHORT_SHA=${SHA:0:7}
+          TEXT="${ICON} *${REPO}*%0ABuild \`${SHORT_SHA}\` on *${BRANCH}* by *${ACTOR}* → *${BUILD_STATUS}*%0A[View run](${RUN_URL})"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d parse_mode="Markdown" \
+            -d text="${TEXT}"
+
