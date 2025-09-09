@@ -27,18 +27,21 @@ services:
       - ./backups:/backups
     environment:
       - PGPASSWORD=devpass
-    entrypoint: >
-            bash -c "while true; do
-    TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S);
-    FILE=/backups/db_$TIMESTAMP.sql;
-    pg_dump -h db -U devuser devdb > $FILE;
-    echo Backup created at $FILE;
-    find /backups -type f -name '*.sql' -mtime +7 -delete;
-    echo Old backups deleted;
-    sleep 86400;
-  done"
-
-
+    entrypoint:
+      - bash
+      - -c
+      - |
+        while true; do
+          TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+          UUID=$(cat /proc/sys/kernel/random/uuid)
+          FILE="/backups/db_${TIMESTAMP}_${UUID}.sql"
+          echo "Creating backup: $FILE"
+          PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h db -U $POSTGRES_USER $POSTGRES_DB > "$FILE"
+          echo "Backup completed: $FILE"
+          find /backups -type f -name '*.sql' -mtime +7 -delete
+          echo "Old backups deleted"
+          sleep 86400
+        done
 
 
   app:
